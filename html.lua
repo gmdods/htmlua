@@ -1,10 +1,32 @@
 HTML = {}
 
 HTML.Mt = {}
+HTML.attrs = {}
 
-local elements = { "div", "p", "a", "button" }
+function table.merge(t1, t2)
+	for k, v in pairs(t2) do
+		t1[k] = v
+	end
+	return t1
+end
 
-for _, v in ipairs(elements) do
+local regular = {
+	id = "string",
+	title = "string",
+	hidden = "boolean",
+	class = "table",
+	style = "table"
+}
+
+local elements = {
+	div = regular,
+	p = regular,
+	a = table.merge({ href = "string" }, regular),
+	button = table.merge({ onclick = "string" }, regular)
+}
+
+for v, t in pairs(elements) do
+	HTML.attrs[v] = t
 	HTML[v] = function(tbl)
 		return setmetatable({ tag = v, inner = tbl }, HTML.Mt)
 	end
@@ -35,17 +57,25 @@ local function attribute(k, v)
 	end
 end
 
-function HTML.Mt.__tostring(elt)
-	local t = { "<", elt.tag }
+local function sortedkeys(t)
 	local keys = {}
-	for k, _ in pairs(elt.inner) do
+	for k, _ in pairs(t) do
 		if type(k) == "string" then
 			table.insert(keys, k)
 		end
 	end
 	table.sort(keys)
-	for _, k in ipairs(keys) do
-		table.insert(t, " " .. attribute(k, elt.inner[k]))
+	return ipairs(keys)
+end
+
+function HTML.Mt.__tostring(elt)
+	local t = { "<", elt.tag }
+	local attrs = HTML.attrs[elt.tag]
+	for _, k in sortedkeys(elt.inner) do
+		local v = elt.inner[k]
+		assert(attrs[k], "attribute name: " .. k)
+		assert(type(v) == attrs[k], "attribute type: " .. k)
+		table.insert(t, " " .. attribute(k, v))
 	end
 	table.insert(t, ">")
 	for _, v in ipairs(elt.inner) do

@@ -16,7 +16,7 @@ assert(tostring(test_a) ==
 	"<a class=\"link\" href=\"https://www.lua.org\">Link</a>", "a")
 
 local test_button = html.button {
-	class = { "click" }, onclick = { "add(this)" }, "Click" }
+	class = { "click" }, onclick = "add(this)", "Click" }
 assert(tostring(test_button) ==
 	"<button class=\"click\" onclick=\"add(this)\">Click</button>", "button")
 
