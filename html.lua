@@ -57,6 +57,14 @@ local function attribute(k, v)
 	end
 end
 
+local function iterator(ref, i)
+	i = i + 1
+	local k = ref.keys[i]
+	if k then
+		return i, k, ref.table[k]
+	end
+end
+
 local function sortedkeys(t)
 	local keys = {}
 	for k, _ in pairs(t) do
@@ -65,14 +73,13 @@ local function sortedkeys(t)
 		end
 	end
 	table.sort(keys)
-	return ipairs(keys)
+	return iterator, { keys = keys, table = t }, 0
 end
 
 function HTML.Mt.__tostring(elt)
 	local t = { "<", elt.tag }
 	local attrs = HTML.attrs[elt.tag]
-	for _, k in sortedkeys(elt.inner) do
-		local v = elt.inner[k]
+	for _, k, v in sortedkeys(elt.inner) do
 		assert(attrs[k], "attribute name: " .. k)
 		assert(type(v) == attrs[k], "attribute type: " .. k)
 		table.insert(t, " " .. attribute(k, v))
