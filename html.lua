@@ -1,13 +1,17 @@
----@class HTML
----@field tag string
----@field inner table
 HTML = {}
 
-HTML.Mt = {}
+---@class HTML.Elt
+---@field tag string
+---@field inner table
+---
+HTML.Elt = {}
+HTML.Elt.__index = HTML.Elt
+
 HTML.attrs = {}
 
 ---Edit table t1 in contain all keys of t2.
 ---This function returns the given table t1.
+---Usually t1 is a literal table.
 ---@param t1 table
 ---@param t2 table
 ---@return table
@@ -57,8 +61,14 @@ local elements = {
 for v, t in pairs(elements) do
 	HTML.attrs[v] = t
 	HTML[v] = function(tbl)
-		return setmetatable({ tag = v, inner = tbl }, HTML.Mt)
+		return setmetatable({ tag = v, inner = tbl }, HTML.Elt)
 	end
+end
+
+---Returns the list of valid attributes
+---@return table
+function HTML.Elt:attrs()
+	return HTML.attrs[self.tag]
 end
 
 ---Stringifies table as a stylesheet
@@ -94,11 +104,11 @@ end
 
 ---Stringifies HTML element
 ---TODO: HTML escape
----@param elt HTML
+---@param elt HTML.Elt
 ---@return string
-function HTML.Mt.__tostring(elt)
+function HTML.Elt.__tostring(elt)
 	local t = { "<", elt.tag }
-	local attrs = HTML.attrs[elt.tag]
+	local attrs = elt:attrs()
 	for _, k, v in sortedkeys(elt.inner) do
 		assert(attrs[k], "attribute name: " .. k)
 		assert(type(v) == attrs[k], "attribute type: " .. k)
