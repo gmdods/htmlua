@@ -37,15 +37,15 @@ end
 ---@return string
 function Attr.attribute(key, val)
 	if type(val) == "boolean" then
-		if val then return key else return "" end
+		if val then return " " .. key else return "" end
 	elseif type(val) == "table" then
 		if key == "style" then
-			return string.format("%s=%q", key, css(val))
+			return string.format(" %s=%q", key, css(val))
 		else
-			return string.format("%s=%q", key, table.concat(val, " "))
+			return string.format(" %s=%q", key, table.concat(val, " "))
 		end
 	else
-		return string.format("%s=%q", key, tostring(val))
+		return string.format(" %s=%q", key, tostring(val))
 	end
 end
 

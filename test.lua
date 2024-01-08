@@ -24,9 +24,9 @@ html.newattr("aria-label", "string")       -- global
 html.attrs.span["aria-hidden"] = "boolean" -- direct
 
 local test_span = html.span {
-	["aria-label"] = "close", ["aria-hidden"] = true, "X" }
+	["aria-label"] = "close", ["aria-hidden"] = false, "X" }
 assert(tostring(test_span) ==
-	"<span aria-hidden aria-label=\"close\">X</span>", "span")
+	"<span aria-label=\"close\">X</span>", "span")
 
 
 print("end")

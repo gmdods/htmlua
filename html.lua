@@ -51,7 +51,7 @@ function HTML.Elt.__tostring(elt)
 	for _, k, v in table.sortedkeys(elt.inner) do
 		assert(attrs[k], "attribute name: " .. k)
 		assert(type(v) == attrs[k], "attribute type: " .. k)
-		table.insert(t, " " .. attr.attribute(k, v))
+		table.insert(t, attr.attribute(k, v))
 	end
 	table.insert(t, ">")
 	for _, v in ipairs(elt.inner) do
