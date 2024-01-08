@@ -12,10 +12,26 @@ HTML.Elt.__index = HTML.Elt
 
 HTML.attrs = {}
 
-for v, t in pairs(attr.elements) do
-	HTML.attrs[v] = t
-	HTML[v] = function(tbl)
-		return setmetatable({ tag = v, inner = tbl }, HTML.Elt)
+---Adds a new tag with valid attributes
+---@param tag string
+---@param attrs table
+function HTML.newelement(tag, attrs)
+	HTML[tag] = function(tbl)
+		return setmetatable({ tag = tag, inner = tbl }, HTML.Elt)
+	end
+	HTML.attrs[tag] = attrs
+end
+
+for tag, attrs in pairs(attr.elements) do
+	HTML.newelement(tag, attrs)
+end
+
+---Adds a new valid attributes
+---@param name string
+---@param type string
+function HTML.newattr(name, type)
+	for _, attrs in pairs(HTML.attrs) do
+		attrs[name] = type
 	end
 end
 

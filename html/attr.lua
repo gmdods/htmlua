@@ -12,6 +12,7 @@ local regular = {
 
 Attr.elements = {
 	div = regular,
+	span = regular,
 	p = regular,
 	a = table.merge({ href = "string" }, regular),
 	button = table.merge({ onclick = "string" }, regular)
