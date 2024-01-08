@@ -1,13 +1,42 @@
+---@class HTML
+---@field tag string
+---@field inner table
 HTML = {}
 
 HTML.Mt = {}
 HTML.attrs = {}
 
+---Edit table t1 in contain all keys of t2.
+---This function returns the given table t1.
+---@param t1 table
+---@param t2 table
+---@return table
 function table.merge(t1, t2)
 	for k, v in pairs(t2) do
 		t1[k] = v
 	end
 	return t1
+end
+
+---This is the iterator for the `sortedkeys` function.
+local function iterator(ref, i)
+	i = i + 1
+	local k = ref.keys[i]
+	if k then
+		return i, k, ref.table[k]
+	end
+end
+
+---An iterator of a table with the keys in order.
+local function sortedkeys(t)
+	local keys = {}
+	for k, _ in pairs(t) do
+		if type(k) == "string" then
+			table.insert(keys, k)
+		end
+	end
+	table.sort(keys)
+	return iterator, { keys = keys, table = t }, 0
 end
 
 local regular = {
@@ -32,10 +61,12 @@ for v, t in pairs(elements) do
 	end
 end
 
-
-local function css(s)
+---Stringifies table as a stylesheet
+---@param styletable table
+---@return string
+local function css(styletable)
 	local t = {}
-	for property, value in pairs(s) do
+	for property, value in pairs(styletable) do
 		if type(property) == "string" then
 			table.insert(t, property .. ": " .. value .. ";")
 		end
@@ -43,39 +74,28 @@ local function css(s)
 	return table.concat(t)
 end
 
-local function attribute(k, v)
-	if type(v) == "boolean" then
-		if v then return k else return "" end
-	elseif type(v) == "table" then
-		if k == "style" then
-			return string.format("%s=%q", k, css(v))
+---Stringifies key-value pair as an attribute
+---@param key string
+---@param val any
+---@return string
+local function attribute(key, val)
+	if type(val) == "boolean" then
+		if val then return key else return "" end
+	elseif type(val) == "table" then
+		if key == "style" then
+			return string.format("%s=%q", key, css(val))
 		else
-			return string.format("%s=%q", k, table.concat(v, " "))
+			return string.format("%s=%q", key, table.concat(val, " "))
 		end
 	else
-		return string.format("%s=%q", k, tostring(v))
+		return string.format("%s=%q", key, tostring(val))
 	end
 end
 
-local function iterator(ref, i)
-	i = i + 1
-	local k = ref.keys[i]
-	if k then
-		return i, k, ref.table[k]
-	end
-end
-
-local function sortedkeys(t)
-	local keys = {}
-	for k, _ in pairs(t) do
-		if type(k) == "string" then
-			table.insert(keys, k)
-		end
-	end
-	table.sort(keys)
-	return iterator, { keys = keys, table = t }, 0
-end
-
+---Stringifies HTML element
+---TODO: HTML escape
+---@param elt HTML
+---@return string
 function HTML.Mt.__tostring(elt)
 	local t = { "<", elt.tag }
 	local attrs = HTML.attrs[elt.tag]
